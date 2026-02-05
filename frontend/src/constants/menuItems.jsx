@@ -27,7 +27,7 @@ export const MENU_ITEMS = [
   },
   {
     title: "Ирц & Цаг",
-    path: "/attendance",
+    path: "/time",
     icon: <Clock size={18} />,
     roles: ["admin", "hr", "manager", "employee"],
   },
@@ -44,7 +44,7 @@ export const MENU_ITEMS = [
   },
   {
     title: "Даалгавар",
-    path: "/tasks",
+    path: "/task",
     icon: <CheckSquare size={18} />,
     roles: ["admin", "manager", "employee"],
   },

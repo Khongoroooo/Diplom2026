@@ -1,3 +1,11 @@
+import { useLocation } from "react-router-dom";
+
 export default function EmployeePage() {
-  return <div className="flex border bg-pink-50 w-64 h-24"></div>;
+  const location = useLocation();
+  const pageName = location.pathname.split("/").filter(Boolean).pop();
+  return (
+    <div className="uppercase text-xs">
+      <p>{pageName}</p>
+    </div>
+  );
 }

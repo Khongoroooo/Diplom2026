@@ -1,1 +1,3 @@
 @import "tailwindcss";
+/* Dark mode-ыг класс дээр суурилж ажиллахыг Tailwind-д хэлж өгөх */
+@variant dark (&:where(.dark, .dark *));
