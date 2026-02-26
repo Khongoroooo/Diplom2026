@@ -1,13 +1,15 @@
 import React, { useState } from "react";
-
+import TimesheetPage from "../components/employeeTimesheet";
+import HeaderSection from "../components/headerSection";
 const AttendancePage = () => {
-  // Жишээ өгөгдөл (Data)
+  const [selectedId, SetSelectedId] = useState(null);
   const [attendanceData] = useState([
     {
       id: 1,
       name: "Бат-Эрдэнэ Г.",
       role: "Ахлах дизайнер",
-      time: "08:50",
+      starttime: "08:50",
+      endtime: "20:01",
       status: "Ирсэн",
       avatar: "БГ",
     },
@@ -15,7 +17,8 @@ const AttendancePage = () => {
       id: 2,
       name: "Сарантуяа О.",
       role: "Frontend хөгжүүлэгч",
-      time: "09:15",
+      starttime: "09:15",
+      endtime: "18:00",
       status: "Хоцорсон",
       avatar: "СО",
     },
@@ -23,7 +26,8 @@ const AttendancePage = () => {
       id: 3,
       name: "Тэмүүлэн Б.",
       role: "Төслийн менежер",
-      time: "08:58",
+      starttime: "08:58",
+      endtime: "21:09",
       status: "Ирсэн",
       avatar: "ТБ",
     },
@@ -31,7 +35,8 @@ const AttendancePage = () => {
       id: 4,
       name: "Анужин П.",
       role: "Backend хөгжүүлэгч",
-      time: "-",
+      starttime: "-",
+      endtime: "_",
       status: "Ирээгүй",
       avatar: "АП",
     },
@@ -39,11 +44,20 @@ const AttendancePage = () => {
       id: 5,
       name: "Болдбаатар Ж.",
       role: "UI/UX дизайнер",
-      time: "08:45",
+      starttime: "08:45",
+      endtime: "19:08",
       status: "Ирсэн",
       avatar: "БЖ",
     },
   ]);
+  if (selectedId) {
+    return (
+      <TimesheetPage
+        employeeId={selectedId}
+        onClose={() => SetSelectedId(null)}
+      />
+    );
+  }
 
   // Төлөвөөс хамаарч өнгө өөрчлөх функц
   const getStatusStyle = (status) => {
@@ -58,9 +72,13 @@ const AttendancePage = () => {
         return "bg-slate-100 text-slate-700";
     }
   };
+  const dashboardPaths = [{ name: "Ирц & Цаг", link: "/attendance" }];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 md:p-8">
+    <div className="min-h-screen bg-white dark:bg-slate-950 p-6 md:p-8">
+      <div className="p-2">
+        <HeaderSection paths={dashboardPaths}></HeaderSection>
+      </div>
       {/* Толгой хэсэг */}
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
@@ -99,6 +117,9 @@ const AttendancePage = () => {
                     Бүртгүүлсэн цаг
                   </th>
                   <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Явсан цаг
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Төлөв
                   </th>
                   <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -129,7 +150,12 @@ const AttendancePage = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm font-mono text-slate-700 dark:text-slate-300">
-                        {employee.time}
+                        {employee.starttime}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm font-mono text-slate-700 dark:text-slate-300">
+                        {employee.endtime}
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -140,7 +166,10 @@ const AttendancePage = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <button className="text-indigo-500 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium transition-colors">
+                      <button
+                        onClick={() => SetSelectedId(employee.id)}
+                        className="text-indigo-500 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium transition-colors"
+                      >
                         Дэлгэрэнгүй
                       </button>
                     </td>

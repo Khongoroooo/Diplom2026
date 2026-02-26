@@ -1,9 +1,8 @@
-import { useLocation } from "react-router-dom";
 import { Users, Moon, Sun, ChevronRight, ChevronLeft } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import HeaderSection from "../components/headerSection";
 
 export default function Dashboard() {
-  const [isDark, setIsDark] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // --- MOCK DATA ---
@@ -35,49 +34,26 @@ export default function Dashboard() {
     setCurrentIndex((prev) => (prev === 0 ? stats.length - 1 : prev - 1));
   };
 
-  // Dark Mode Logic
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (savedTheme === "dark") setIsDark(true);
-  }, []);
-
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [isDark]);
-
   const User = { name: "Хонгороо" };
-  const location = useLocation();
-  const pageName =
-    location.pathname.split("/").filter(Boolean).pop() || "Dashboard";
+  const dashboardPaths = [{ name: "Dashboard", link: "/" }];
 
   return (
     <div className="min-h-screen transition-colors duration-300 bg-white dark:bg-slate-950 space-y-8 p-6 font-sans">
       {/* Header хэсэг */}
       <div className="flex items-center justify-between">
-        <div className="flex flex-col w-fit">
+        <div className="p-4">
+          <HeaderSection
+            paths={dashboardPaths}
+            title="Сайн байна уу"
+            subtitle="Өнөөдрийн тойм"
+          ></HeaderSection>
+        </div>
+        {/* <div className="flex flex-col w-fit">
           <span className="text-xs font-bold text-slate-700 dark:text-slate-500 uppercase tracking-[0.2em]">
             {pageName}
           </span>
           <div className="h-1 w-full mt-2 bg-gradient-to-r from-blue-700 via-purple-500 to-pink-400 rounded-full"></div>
-        </div>
-
-        <button
-          onClick={() => setIsDark(!isDark)}
-          className="p-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
-        >
-          {isDark ? (
-            <Sun size={20} className="text-amber-400" />
-          ) : (
-            <Moon size={20} className="text-indigo-600" />
-          )}
-        </button>
+        </div> */}
       </div>
 
       <header>
