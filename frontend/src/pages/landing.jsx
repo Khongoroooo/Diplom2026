@@ -1,16 +1,45 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 export default function LandingPage({ onLogin }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    onLogin(); 
-    navigate("/dashboard"); 
-  };
 
+    try { 
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/users/login/",
+        {
+          email: email,
+          password: password,
+        },
+      );
+
+      const { access, refresh } = response.data;
+
+      localStorage.setItem("access_token", access);
+      localStorage.setItem("refresh_token", refresh);
+
+      const decoded = jwtDecode(access);
+      localStorage.setItem("user_role", decoded.role);
+      localStorage.setItem("user_name", decoded.username || decoded.email);
+
+      onLogin(decoded);
+      navigate("/dashboard");
+    } catch (error) {
+      const errorMsg =
+        error.response?.data?.detail ||
+        "Нэвтрэх нэр эсвэл нууц үг буруу байна!";
+      alert(errorMsg);
+      console.error("Login error:", error);
+    }
+  };
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* NAVBAR */}
@@ -61,6 +90,8 @@ export default function LandingPage({ onLogin }) {
                 <input
                   type="email"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full p-3 rounded-lg border border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                   placeholder="example@mail.com"
                 />
@@ -72,6 +103,8 @@ export default function LandingPage({ onLogin }) {
                 <input
                   type="password"
                   required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full p-3 rounded-lg border border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                   placeholder="••••••••"
                 />

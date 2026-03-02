@@ -1,24 +1,25 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import { MENU_ITEMS } from "../constants/menuItems";
-import { Settings, LogOut, User, ChevronUp } from "lucide-react";
+import { LogOut, User, ChevronUp } from "lucide-react";
 
 export default function Sidebar({ onLogout }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
+
+  const user = {
+    name: localStorage.getItem("user_name") || "Хэрэглэгч",
+    role: localStorage.getItem("user_role") || "employee",
+    avatar: `https://ui-avatars.com/api/?name=${localStorage.getItem("user_name")}&background=random`,
+  };
+
   const handleLogout = () => {
+    localStorage.clear();
     onLogout(); // 1. isAuthenticated-ийг false болгоно
     navigate("/"); // 2. Landing page руу үсэрнэ
   };
-
-  const user = {
-    name: "Хонгороо",
-    role: "admin",
-    avatar: "https://ui-avatars.com/api/?name=Hongoroo&background=random", // Freepik-ийн холбоос зураг биш байсан тул placeholder ашиглав
-  };
-
   // Гадна талд дарахад цонхыг хаах
   useEffect(() => {
     function handleClickOutside(event) {
@@ -45,7 +46,7 @@ export default function Sidebar({ onLogout }) {
               return (
                 <p
                   key={index}
-                  className="mt-6 mb-2 text-xs uppercase text-slate-500 font-semibold px-4"
+                  className="mt-6 mb-2 text-xs uppercase text-slate-900 dark:text-slate-100 font-semibold px-4"
                 >
                   {item.title}
                 </p>
@@ -74,21 +75,23 @@ export default function Sidebar({ onLogout }) {
               <p className="text-sm dark:text-white font-bold truncate">
                 Мэнд хүргэе, {user.name}!
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user.role}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                {user.role}
+              </p>
             </div>
 
             <Link
               to="/profile"
-              className="flex items-center gap-3 px-3 py-2 text-sm dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+              className="flex items-center gap-3 px-3 py-2 text-sm text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
               onClick={() => setIsProfileOpen(false)}
             >
-              <User size={16} className="text-slate-400" />
+              <User size={16} className="text-slate-700 dark:text-slate-200" />
               Профайл засах
             </Link>
 
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
+              className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
             >
               <LogOut size={16} />
               Гарах
@@ -136,11 +139,11 @@ function MenuItem({ icon, label, to, isActive }) {
       className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl transition-all duration-200 mb-1
         ${
           isActive
-            ? "dark:bg-blue-600/15 bg-blue-500/10 text-blue-500 border-r-4 border-blue-500"
-            : "dark:text-slate-400 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-700 dark:hover:text-white"
+            ? "dark:bg-blue-600/15 bg-blue-500/10 bg-gradient-to-r from-blue-700/50 via-purple-500/50 to-pink-400/50 dark:text-white text-white border-r-5 border-pink-400"
+            : "dark:text-slate-300 text-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-700 dark:hover:text-white"
         }`}
     >
-      <span className={`${isActive ? "text-blue-500" : "text-slate-400"}`}>
+      <span className={`${isActive ? "dark:text-white text-white" : "dark:text-slate-300 text-slate-700"}`}>
         {icon}
       </span>
       <span className="font-medium">{label}</span>
