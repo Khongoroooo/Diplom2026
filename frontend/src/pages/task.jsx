@@ -47,7 +47,7 @@ export default function Task() {
   ];
   return (
     <div className="min-h-screen transition-colors duration-300 bg-white dark:bg-slate-950 space-y-8 p-6 font-sans">
-      <div className="p-4">
+      <div className="">
         <HeaderSection paths={pageName} title="Даалгавар"></HeaderSection>
       </div>
       <div className="p-8 bg-gray-50 min-h-screen font-sans">

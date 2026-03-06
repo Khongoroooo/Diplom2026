@@ -4,7 +4,7 @@ export default function EmployeePage() {
   const pageName = [{ name: "Ажилчид" }];
   return (
     <div className="min-h-screen transition-colors duration-300 bg-white dark:bg-slate-950 space-y-8 p-6 font-sans">
-      <div className="p-4">
+      <div className="">
         <HeaderSection paths={pageName} title="Ажилчид"></HeaderSection>
       </div>
       <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm">

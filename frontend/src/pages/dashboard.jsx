@@ -41,7 +41,7 @@ export default function Dashboard() {
     <div className="min-h-screen transition-colors duration-300 bg-white dark:bg-slate-950 space-y-8 p-6 font-sans">
       {/* Header хэсэг */}
       <div className="flex items-center justify-between">
-        <div className="p-4">
+        <div className="">
           <HeaderSection
             paths={dashboardPaths}
             title="Сайн байна уу"

@@ -76,7 +76,7 @@ const AttendancePage = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 p-6 md:p-8">
-      <div className="p-2">
+      <div className="">
         <HeaderSection paths={dashboardPaths}></HeaderSection>
       </div>
       {/* Толгой хэсэг */}

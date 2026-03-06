@@ -1,7 +1,7 @@
 import React from "react";
 import { ChevronRight } from "lucide-react";
 
-const HeaderSection = ({ paths, title, subtitle }) => {
+const HeaderSection = ({ paths }) => {
   const safePaths = Array.isArray(paths) ? paths : [];
   // Хамгийн сүүлийн нэрийг авах
   const lastName =
@@ -34,16 +34,6 @@ const HeaderSection = ({ paths, title, subtitle }) => {
         <div className="h-[3px] w-full min-w-[80px] mt-2 bg-gradient-to-r from-blue-700 via-purple-500 to-pink-400 rounded-full shadow-sm"></div>
       </div>
       {/* 3. Гарчиг */}
-      <div className="mt-2">
-        <h1 className="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">
-          {title}
-        </h1>
-        {subtitle && (
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
-            {subtitle}
-          </p>
-        )}
-      </div>
     </div>
   );
 };

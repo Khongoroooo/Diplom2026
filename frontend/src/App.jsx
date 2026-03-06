@@ -8,8 +8,9 @@ import ProfilPage from "./pages/profile";
 import AttendancePage from "./pages/time";
 import Task from "./pages/task";
 import DarkMode from "./components/darkModeToggle";
-import Settings from "./pages/settings";
+import Settings from "./pages/usersSettings";
 import LandingPage from "./pages/landing";
+import AddUser from "./pages/addUser";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -46,6 +47,7 @@ function App() {
                     <Route path="/time" element={<AttendancePage />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="*" element={<Navigate to="/dashboard" />} />
+                    <Route path="/addUser" element={<AddUser />} />
                   </Routes>
                 </main>
               </div>

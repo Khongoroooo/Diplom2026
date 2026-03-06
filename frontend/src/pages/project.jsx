@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import HeaderSection from "../components/headerSection";
-import { Search, Calendar, Folder } from "lucide-react";
+import { Search, Calendar, Folder, Plus } from "lucide-react";
 
 export default function ProjectPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -58,7 +58,7 @@ export default function ProjectPage() {
   return (
     <div className="min-h-screen transition-colors duration-300 bg-white dark:bg-slate-950 space-y-6 p-6 font-sans text-slate-900 dark:text-slate-100">
       {/* Дээд хэсэг: Гарчиг болон Хайлт */}
-      <div className="flex p-4 flex-col md:flex-row md:items-center justify-between gap-4 ">
+      <div className=" flex flex-col md:flex-row md:items-center justify-between gap-4">
         <HeaderSection paths={projectsPage} title="Төслүүд" />
 
         <div className="relative w-full md:w-80">
@@ -126,8 +126,8 @@ export default function ProjectPage() {
         )}
       </div>
 
-      <button className="fixed bottom-20 right-6 bg-gradient-to-r from-blue-700 via-purple-500 to-pink-400 hover:bg-indigo-700 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-2xl transition-transform hover:scale-110">
-        +
+      <button className="fixed bottom-20 right-6 bg-gradient-to-r from-blue-700 via-purple-500 to-pink-400 hover:bg-indigo-700 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110">
+        <Plus size={26} strokeWidth={2} />
       </button>
     </div>
   );
