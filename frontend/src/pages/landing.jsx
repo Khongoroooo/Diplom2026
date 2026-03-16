@@ -12,9 +12,9 @@ export default function LandingPage({ onLogin }) {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
 
-    try { 
+    try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/users/login/",
+        "http://172.20.10.7:8000/api/users/login/",
         {
           email: email,
           password: password,

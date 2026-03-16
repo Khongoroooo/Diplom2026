@@ -167,7 +167,10 @@ export default function UserManagement() {
                   </td>
                   <td className="p-4 text-right">
                     <div className="flex justify-end gap-2">
-                      <button className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400">
+                      <button
+                        onClick={() => navigate(`/editUser/${user.id}`)}
+                        className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                      >
                         <Edit2 size={18} />
                       </button>
                       <button

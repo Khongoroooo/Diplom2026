@@ -19,7 +19,8 @@ export default function Sidebar({ onLogout }) {
   // States
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
+  const [isOpen, setIsOpen] = useState(false);
+  ;
   // Refs
   const profileRef = useRef(null);
   const settingsRef = useRef(null);
@@ -51,7 +52,10 @@ export default function Sidebar({ onLogout }) {
   }, []);
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 dark:bg-slate-950 flex flex-col border-r border-slate-200/10 shadow-[4px_0_24px_-15px_rgba(0,0,0,0.3)] z-50">
+    <aside
+      className={`fixed left-0 top-0 h-screen w-64 dark:bg-slate-950 flex flex-col border-r border-slate-200/10 z-50 transition-transform duration-300 
+  ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
+    >
       {/* Logo Section */}
       <div className="px-6 py-4 text-xl font-bold">
         <span className="text-3xl bg-gradient-to-r from-blue-700 via-purple-500 to-pink-400 bg-clip-text text-transparent font-sans">
@@ -215,6 +219,9 @@ export default function Sidebar({ onLogout }) {
           />
         </div>
       </div>
+      <nav onClick={() => setIsOpen(false)}> 
+         {/* MENU_ITEMS ... */}
+      </nav>
     </aside>
   );
 }
