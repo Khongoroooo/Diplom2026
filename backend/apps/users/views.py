@@ -18,6 +18,13 @@ class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+
+        if hasattr(user, 'role') and user.role == 'ADMIN':
+            return User.objects.all()
+        return User.objects.exclude(role='ADMIN')
 
 class UserDeleteView(generics.DestroyAPIView):
     queryset = User.objects.all()

@@ -15,6 +15,12 @@ export const MENU_ITEMS = [
     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
   },
   {
+    title: "Ирц",
+    path: "/emptime",
+    icon: <Clock size={18} />,
+    roles: ["HR", "EMPLOYEE", "MANAGER"],
+  },
+  {
     title: "HR Management",
     isHeader: true,
     roles: ["ADMIN", "HR"],
@@ -23,13 +29,13 @@ export const MENU_ITEMS = [
     title: "Ажилчид",
     path: "/employees",
     icon: <Users size={18} />,
-    roles: ["ADMIN", "HR"],
+    roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
   },
   {
     title: "Ирц & Цаг",
     path: "/time",
     icon: <Clock size={18} />,
-    roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
+    roles: ["ADMIN", "HR", "MANAGER"],
   },
   {
     title: "Project Management",
@@ -57,6 +63,6 @@ export const MENU_ITEMS = [
     title: "Тохиргоо",
     path: "/settings",
     icon: <Settings size={18} />,
-    roles: ["ADMIN"],
+    roles: ["ADMIN", "HR"],
   },
 ];

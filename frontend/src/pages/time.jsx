@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import TimesheetPage from "../components/employeeTimesheet";
 import HeaderSection from "../components/headerSection";
+import { useNavigate } from "react-router-dom";
+
 const AttendancePage = () => {
   const [selectedId, SetSelectedId] = useState(null);
+  const navigate = useNavigate();
+  const currentRole = localStorage.getItem("user_role");
+  const isAdminOrHR = currentRole === "ADMIN" || currentRole === "HR";
   const [attendanceData] = useState([
     {
       id: 1,
@@ -92,6 +97,14 @@ const AttendancePage = () => {
           </div>
 
           <div className="flex gap-3">
+            {isAdminOrHR && (
+              <button
+                onClick={() => navigate("/adminqr")}
+                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-indigo-500/20 transition-all"
+              >
+                Ирц бүртгэлийн дэлгэц
+              </button>
+            )}
             <button className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 transition-all">
               Шүүлтүүр
             </button>

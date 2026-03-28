@@ -12,6 +12,10 @@ import Settings from "./pages/usersSettings";
 import LandingPage from "./pages/landing";
 import AddUser from "./pages/addUser";
 import EditUser from "./pages/editUser";
+import Positions from "./pages/position";
+import Department from "./pages/department";
+import AdminQR from "./pages/adminQR";
+import MyAttendancePage from "./pages/employeeTime";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -50,7 +54,11 @@ function App() {
                       <Route path="/settings" element={<Settings />} />
                       <Route path="*" element={<Navigate to="/dashboard" />} />
                       <Route path="/addUser" element={<AddUser />} />
+                      <Route path="/departments" element={<Department />} />
+                      <Route path="/positions" element={<Positions />} />
                       <Route path="/editUser/:id" element={<EditUser />} />
+                      <Route path="/adminqr" element={<AdminQR />} />
+                      <Route path="/emptime" element={<MyAttendancePage />} />
                     </Routes>
                   </div>
                 </main>

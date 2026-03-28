@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+import sys
 from dotenv import load_dotenv
 from datetime import timedelta
 
@@ -32,6 +33,7 @@ SECRET_KEY = "django-insecure-uavug&&#f2*dp$hk*9qfnksje11q6!vu$j89rt7fe=+d$11v3k
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
 
 # Application definition
@@ -49,6 +51,7 @@ INSTALLED_APPS = [
     "apps.users",
     "apps.hr",
     "apps.tasks",
+    "apps.attendance",
 
 ]
 
@@ -71,6 +74,12 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
 
 ROOT_URLCONF = "backend.urls"
 
@@ -138,9 +147,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "mn-mn"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = 'Asia/Ulaanbaatar'
 
 USE_I18N = True
 
