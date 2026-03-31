@@ -7,8 +7,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, generics
 from .models import Attendance
-from .serializers import AttendanceSerializer
+from .serializers import AttendanceSerializer, DailyAttendanceSerializer, User
 import random
+from django.db import models
+
+
 
 # 1. Админд: QR Token үүсгэх
 class GenerateQRTokenView(APIView):
@@ -126,3 +129,39 @@ class MyAttendanceListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Attendance.objects.filter(user=self.request.user)
+    
+   
+# 5. Ажилчдын тухайн өдрийн ирцийг гаргах 
+class DailyAttendanceListAPI(generics.ListAPIView):
+    serializer_class = DailyAttendanceSerializer
+
+    def get_queryset(self):
+        target_date = self.request.query_params.get('date', timezone.now().date())
+        return User.objects.all().prefetch_related(
+            models.Prefetch(
+                'attendances',
+                queryset=Attendance.objects.filter(date=target_date),
+                to_attr='today_attendance'
+            )
+        )
+
+class AttendanceHistoryAPI(generics.ListAPIView):
+    serializer_class = AttendanceSerializer
+
+    def get_queryset(self):
+        # URL-аас user_id, month, year гэсэн параметрүүдийг шүүж авна
+        user_id = self.request.query_params.get('user_id')
+        month = self.request.query_params.get('month')
+        year = self.request.query_params.get('year', timezone.now().year)
+
+        if not user_id:
+            return Attendance.objects.none()
+
+        queryset = Attendance.objects.filter(user_id=user_id)
+
+        if month:
+            queryset = queryset.filter(date__month=month)
+        if year:
+            queryset = queryset.filter(date__year=year)
+
+        return queryset.order_by('-date')

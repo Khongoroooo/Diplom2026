@@ -157,7 +157,7 @@ export default function MyAttendancePage() {
                 attendances.map((item) => (
                   <tr
                     key={item.id}
-                    className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
+                    className="hover:bg-slate-50/80 dark:text-white dark:hover:bg-slate-800/40 transition-colors"
                   >
                     <td className="px-6 py-4 font-bold text-sm">
                       {new Date(item.date).toLocaleDateString("mn-MN")}
