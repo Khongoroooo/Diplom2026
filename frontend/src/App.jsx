@@ -16,6 +16,9 @@ import Positions from "./pages/position";
 import Department from "./pages/department";
 import AdminQR from "./pages/adminQR";
 import MyAttendancePage from "./pages/employeeTime";
+import TimesheetPage from "./components/employeeTimesheet";
+import AddProject from "./pages/addProject";
+import ProjectDetail from "./pages/projectDetail";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -59,6 +62,9 @@ function App() {
                       <Route path="/editUser/:id" element={<EditUser />} />
                       <Route path="/adminqr" element={<AdminQR />} />
                       <Route path="/emptime" element={<MyAttendancePage />} />
+                      <Route path="/timesheet" element={<TimesheetPage />} />
+                      <Route path="/addproject" element={<AddProject />} />
+                      <Route path="/projects/:id" element={<ProjectDetail />} />
                     </Routes>
                   </div>
                 </main>

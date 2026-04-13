@@ -128,40 +128,105 @@ class MyAttendanceListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Attendance.objects.filter(user=self.request.user)
-    
+        # Одоо нэвтэрсэн байгаа хэрэглэгч
+        queryset = Attendance.objects.filter(user=self.request.user)
+        
+        # Параметрүүдийг хүлээн авах
+        date_str = self.request.query_params.get('date')
+        month = self.request.query_params.get('month')
+        year = self.request.query_params.get('year')
+
+        # 1. Өдрөөр шүүх (Хэрэв date ирвэл)
+        if date_str:
+            try:
+                return queryset.filter(date=date_str)
+            except ValueError:
+                pass
+
+        # 2. Сарын шүүлтүүр
+        if month:
+            try:
+                queryset = queryset.filter(date__month=int(month))
+            except ValueError:
+                pass
+        
+        # 3. Жилийн шүүлтүүр
+        if year:
+            try:
+                queryset = queryset.filter(date__year=int(year))
+            except ValueError:
+                pass
+        else:
+            # Жил ирээгүй бол одоогийн жилээр хязгаарлах нь зөв (performance-д сайн)
+            queryset = queryset.filter(date__year=timezone.now().year)
+
+        return queryset.order_by('-date')
    
 # 5. Ажилчдын тухайн өдрийн ирцийг гаргах 
 class DailyAttendanceListAPI(generics.ListAPIView):
     serializer_class = DailyAttendanceSerializer
 
     def get_queryset(self):
-        target_date = self.request.query_params.get('date', timezone.now().date())
+        target_date_str = self.request.query_params.get('date')
+        
+        if target_date_str:
+            # String-ийг Date объект руу заавал хөрвүүлнэ
+            try:
+                from datetime import datetime
+                target_date = datetime.strptime(target_date_str, '%Y-%m-%d').date()
+            except (ValueError, TypeError):
+                target_date = timezone.localdate()
+        else:
+            target_date = timezone.localdate() 
+
+        # МАШ ЧУХАЛ: Prefetch доторх шүүлтүүрийг шалгах
         return User.objects.all().prefetch_related(
             models.Prefetch(
                 'attendances',
-                queryset=Attendance.objects.filter(date=target_date),
+                queryset=Attendance.objects.filter(date=target_date), # Энд date=date байх ёстой
                 to_attr='today_attendance'
             )
-        )
+        ).order_by('first_name')
 
 class AttendanceHistoryAPI(generics.ListAPIView):
     serializer_class = AttendanceSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # URL-аас user_id, month, year гэсэн параметрүүдийг шүүж авна
         user_id = self.request.query_params.get('user_id')
+        date_str = self.request.query_params.get('date')  # Шинээр нэмэв
         month = self.request.query_params.get('month')
-        year = self.request.query_params.get('year', timezone.now().year)
+        year = self.request.query_params.get('year')
 
         if not user_id:
             return Attendance.objects.none()
 
         queryset = Attendance.objects.filter(user_id=user_id)
 
+        # 1. Хэрэв тодорхой өдөр ирсэн бол сар/жил хамаарахгүй шууд тэр өдрийг шүүнэ
+        if date_str:
+            try:
+                # date_str нь 'YYYY-MM-DD' форматтай ирнэ
+                return queryset.filter(date=date_str).order_by('-date')
+            except (ValueError, TypeError):
+                pass
+
+        # 2. Хэрэв өдөр ирээгүй бол сар болон жилээр шүүх
         if month:
-            queryset = queryset.filter(date__month=month)
+            try:
+                month_int = int(month)
+                queryset = queryset.filter(date__month=month_int)
+            except ValueError:
+                pass
+        
         if year:
-            queryset = queryset.filter(date__year=year)
+            try:
+                year_int = int(year)
+                queryset = queryset.filter(date__year=year_int)
+            except ValueError:
+                queryset = queryset.filter(date__year=timezone.now().year)
+        else:
+            # Жил ирээгүй бол одоогийн жилээр шүүнэ
+            queryset = queryset.filter(date__year=timezone.now().year)
 
         return queryset.order_by('-date')

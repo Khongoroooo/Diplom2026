@@ -22,17 +22,15 @@ export default function EmployeePage() {
   // localStorage-аас role-ийг авах
   const currentRole = localStorage.getItem("user_role");
   const isAdminOrHR = currentRole === "ADMIN" || currentRole === "HR";
+  const API_BASE_URL = "http://192.168.1.10:8000/api/users";
 
   // Хэрэглэгчдийн жагсаалт татах
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      const response = await axios.get(
-        "http://192.168.1.10:8000/api/users/list/",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const response = await axios.get(`${API_BASE_URL}/list/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setUsers(response.data);
     } catch (error) {
       console.error("Дата татахад алдаа гарлаа:", error);
@@ -46,7 +44,7 @@ export default function EmployeePage() {
     if (window.confirm("Энэ хэрэглэгчийг системээс бүрмөсөн устгах уу?")) {
       try {
         const token = localStorage.getItem("access_token");
-        await axios.delete(`http://192.168.1.10:8000/api/users/${id}/delete/`, {
+        await axios.delete(`${API_BASE_URL}/${id}/delete/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -100,25 +98,25 @@ export default function EmployeePage() {
       </div>
 
       {/* Employee Table */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+      <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
-                <th className="px-6 py-5 text-xs font-bold uppercase tracking-wider text-slate-500">
+              <tr className="bg-slate-50/50 text-slate-500 dark:text-slate-200 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                <th className="px-6 py-5 text-xs font-bold uppercase tracking-wider ">
                   Ажилтан
                 </th>
-                <th className="px-6 py-5 text-xs font-bold uppercase tracking-wider text-slate-500">
+                <th className="px-6 py-5 text-xs font-bold uppercase tracking-wider ">
                   Хэлтэс
                 </th>
-                <th className="px-6 py-5 text-xs font-bold uppercase tracking-wider text-slate-500">
+                <th className="px-6 py-5 text-xs font-bold uppercase tracking-wider ">
                   Албан тушаал
                 </th>
-                <th className="px-6 py-5 text-xs font-bold uppercase tracking-wider text-slate-500">
+                <th className="px-6 py-5 text-xs font-bold uppercase tracking-wider ">
                   Холбоо барих
                 </th>
                 {isAdminOrHR && (
-                  <th className="px-6 py-5 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">
+                  <th className="px-6 py-5 text-xs font-bold uppercase tracking-wider  text-right">
                     Үйлдэл
                   </th>
                 )}
@@ -216,6 +214,11 @@ export default function EmployeePage() {
               )}
             </tbody>
           </table>
+        </div>
+        <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+          <p className="text-xs text-slate-500">
+            Нийт {users.length} ажилтан байна
+          </p>
         </div>
       </div>
     </div>

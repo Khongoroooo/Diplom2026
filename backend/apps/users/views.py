@@ -34,4 +34,4 @@ class UserUpdateView(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
-    parser_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]

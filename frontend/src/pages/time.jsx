@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios"; // axios суулгасан байх шаардлагатай
+import axios from "axios";
 import TimesheetPage from "../components/employeeTimesheet";
 import HeaderSection from "../components/headerSection";
 import { useNavigate } from "react-router-dom";
 
 const AttendancePage = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [attendanceData, setAttendanceData] = useState([]); // Хоосон жагсаалтаар эхэлнэ
+  const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
   const currentRole = localStorage.getItem("user_role");
   const isAdminOrHR = currentRole === "ADMIN" || currentRole === "HR";
 
-  // --- API-аас дата татах хэсэг ---
   const fetchAttendance = async () => {
     try {
       setLoading(true);
@@ -22,7 +21,7 @@ const AttendancePage = () => {
         "http://192.168.1.10:8000/api/attendance/daily/",
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Хэрэв JWT ашиглаж байгаа бол
+            Authorization: `Bearer ${token}`,
           },
         },
       );
@@ -37,12 +36,11 @@ const AttendancePage = () => {
   useEffect(() => {
     fetchAttendance();
   }, []);
-  // ------------------------------
 
   if (selectedEmployee) {
     return (
       <TimesheetPage
-        employee={selectedEmployee} // ID биш, обьектыг бүхэлд нь дамжуулна
+        employee={selectedEmployee}
         onClose={() => setSelectedEmployee(null)}
       />
     );
@@ -54,8 +52,9 @@ const AttendancePage = () => {
         return "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400";
       case "Хоцорсон":
         return "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400";
-      case "Тасалсан": // Backend-ийн "Тасалсан" гэдэгтэй тааруулав
+      case "Тасалсан":
       case "Ирээгүй":
+      case "Бүртгэлгүй": // Backend-ээс ирж буй "Бүртгэлгүй" төлөвт
         return "bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400";
       default:
         return "bg-slate-100 text-slate-700";
@@ -98,34 +97,54 @@ const AttendancePage = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800">
-                  <th className="px-6 py-4 text-xs font-semibold uppercase text-slate-500">
+                <tr className="bg-slate-50/50 text-slate-500 dark:text-slate-200 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800">
+                  <th className="px-6 py-4 text-xs font-semibold uppercase ">
                     Ажилтан
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold uppercase text-slate-500">
+                  <th className="px-6 py-4 text-xs font-semibold uppercase ">
                     Хэлтэс
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold uppercase text-slate-500 text-center">
+                  <th className="px-6 py-4 text-xs font-semibold uppercase  text-center">
                     Ирсэн
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold uppercase text-slate-500 text-center">
+                  <th className="px-6 py-4 text-xs font-semibold uppercase  text-center">
                     Явсан
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold uppercase text-slate-500 text-center">
+                  <th className="px-6 py-4 text-xs font-semibold uppercase  text-center">
+                    Хоцорсон
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase  text-center">
+                    Илүү цаг
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase  text-center">
                     Төлөв
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold uppercase text-slate-500">
+                  <th className="px-6 py-4 text-xs font-semibold uppercase  text-center">
                     Үйлдэл
                   </th>
                 </tr>
               </thead>
-              {loading ? (
-                <div className="px-6 text-center py-12 text-slate-500 animate-pulse">
-                  Уншиж байна...
-                </div>
-              ) : (
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-                  {attendanceData.map((employee) => (
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                {loading ? (
+                  <tr>
+                    <td
+                      colSpan="6"
+                      className="px-6 py-12 text-center text-slate-500 animate-pulse"
+                    >
+                      Уншиж байна...
+                    </td>
+                  </tr>
+                ) : attendanceData.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan="6"
+                      className="px-6 py-12 text-center text-slate-500"
+                    >
+                      Мэдээлэл олдсонгүй.
+                    </td>
+                  </tr>
+                ) : (
+                  attendanceData.map((employee) => (
                     <tr
                       key={employee.id}
                       className="hover:bg-slate-50/80 dark:hover:bg-slate-900/40 transition-colors"
@@ -147,7 +166,13 @@ const AttendancePage = () => {
                         {employee.check_in}
                       </td>
                       <td className="px-6 py-4 text-center font-mono text-sm text-slate-700 dark:text-slate-300">
-                        {employee.check_out || "-"}
+                        {employee.check_out}
+                      </td>
+                      <td className="px-6 py-4 text-center text-sm text-rose-500 font-medium">
+                        {employee.late_time}
+                      </td>
+                      <td className="px-6 py-4 text-center text-sm text-indigo-500 font-medium">
+                        {employee.overtime}
                       </td>
                       <td className="px-6 py-4 text-center">
                         <span
@@ -156,18 +181,18 @@ const AttendancePage = () => {
                           {employee.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 text-right">
                         <button
-                          onClick={() => setSelectedEmployee(employee)} // employee обьектыг дамжуулна
+                          onClick={() => setSelectedEmployee(employee)}
                           className="text-indigo-500 hover:text-indigo-700 text-sm font-medium"
                         >
                           Дэлгэрэнгүй
                         </button>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              )}
+                  ))
+                )}
+              </tbody>
             </table>
           </div>
 

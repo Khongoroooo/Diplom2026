@@ -1,8 +1,10 @@
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react"; // useEffect нэмсэн
 import HeaderSection from "../components/headerSection";
-
+import { ArrowLeft } from "lucide-react";
 export default function Department() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [departments, setDepartments] = useState([]);
   const [newDeptName, setNewDeptName] = useState(""); // Шинэ хэлтсийн нэр хадгалах
@@ -46,7 +48,15 @@ export default function Department() {
 
   return (
     <div className="min-h-screen transition-colors duration-300 bg-white dark:bg-slate-950 space-y-8 p-8 font-sans">
-      <HeaderSection paths={pageName} />
+      <div className="flex items-center gap-3 mb-10" data-aos="fade-right">
+        <button
+          onClick={() => navigate(-1)}
+          className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-600 dark:text-slate-400 hover:text-blue-600 hover:shadow-lg transition-all active:scale-90"
+        >
+          <ArrowLeft size={20} />
+        </button>
+        <HeaderSection paths={pageName} />
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Зүүн тал: Хэлтсүүдийн жагсаалт */}

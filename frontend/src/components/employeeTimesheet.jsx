@@ -1,42 +1,45 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Calendar,
-  Clock,
-  AlertCircle,
-  User as UserIcon,
-  ArrowLeft, // Буцах сумыг илүү тохиромжтойгоор солив
-} from "lucide-react";
+import "react-datepicker/dist/react-datepicker.css";
+import { ArrowLeft } from "lucide-react";
 import HeaderSection from "./headerSection";
+import AttendanceFilters from "./attendanceFilters"; // Шинэ компонентоо импортлох
 
 const TimesheetPage = ({ employee, onClose }) => {
   const [attendances, setAttendances] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
-  const [currentYear] = useState(new Date().getFullYear());
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const API_BASE_URL = "http://192.168.1.10:8000/api/attendance";
-
-  // Хэрэв employee объект биш зөвхөн ID ирж байгаа бол employeeId-г ашиглана
   const employeeId = employee?.id || employee;
   const fullName = employee?.full_name || "Ажилтан";
 
   useEffect(() => {
     fetchEmployeeAttendance();
-  }, [employeeId, currentMonth, currentYear]);
+  }, [employeeId, currentMonth, currentYear, selectedDate]);
 
   const fetchEmployeeAttendance = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("access_token");
+      const params = {
+        user_id: employeeId,
+        year: currentYear,
+        month: currentMonth,
+      };
+
+      if (selectedDate) {
+        const year = selectedDate.getFullYear();
+        const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
+        const day = String(selectedDate.getDate()).padStart(2, "0");
+        params.date = `${year}-${month}-${day}`;
+      }
+
       const response = await axios.get(`${API_BASE_URL}/history/`, {
-        params: {
-          user_id: employeeId,
-          month: currentMonth,
-          year: currentYear,
-        },
+        params,
         headers: { Authorization: `Bearer ${token}` },
       });
       setAttendances(response.data);
@@ -71,110 +74,114 @@ const TimesheetPage = ({ employee, onClose }) => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 p-6 font-sans animate-in fade-in duration-500">
+    <div className="min-h-screen bg-white dark:bg-slate-950 p-6 font-sans transition-colors duration-300">
+      <style>{`
+        .react-datepicker { border-radius: 24px !important; border: none !important; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1) !important; background-color: #ffffff !important; padding: 10px; }
+        .dark .react-datepicker { background-color: #1e293b !important; border: 1px solid #334155 !important; }
+        .dark .react-datepicker__header { background-color: #1e293b !important; border-bottom: 1px solid #334155 !important; }
+        .dark .react-datepicker__current-month, .dark .react-datepicker__day-name, .dark .react-datepicker__day { color: #f1f5f9 !important; }
+        .dark .react-datepicker__day:hover { background-color: #334155 !important; border-radius: 12px; }
+        .react-datepicker__day--selected { background-color: #4f46e5 !important; border-radius: 12px !important; }
+        .react-datepicker__navigation { top: 15px; }
+      `}</style>
+
       <div className="max-w-6xl mx-auto">
         {/* Top Navigation */}
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all text-slate-500"
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl text-slate-500"
           >
             <ArrowLeft size={24} />
           </button>
           <HeaderSection paths={[{ name: "Дэлгэрэнгүй" }]} />
         </div>
 
-        {/* --- ШИНЭ ХЭСЭГ: Ажилтны мэдээлэл (Profile Header) --- */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-8 p-6 bg-slate-50/50 dark:bg-slate-900/50 rounded-[32px] border border-slate-100 dark:border-slate-800">
+        {/* Profile Header */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-8 p-6 bg-slate-50/50 dark:bg-slate-900/50 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm">
           <div className="flex items-center gap-5">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-indigo-200 dark:shadow-none uppercase">
               {fullName.includes(".") ? fullName.split(".")[1][0] : fullName[0]}
             </div>
             <div>
-              <h1 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight uppercase">
+              <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1">
+                Ажилтны нэр
+              </p>
+              <h1 className="text-2xl font-black text-slate-800 dark:text-white uppercase italic">
                 {fullName}
               </h1>
-              <div className="flex items-center gap-2 mt-1 text-slate-500"></div>
             </div>
           </div>
-
-          <div className="flex gap-2">
-            <div className="px-4 py-2 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                Нийт бүртгэл
-              </p>
-              <p className="text-lg font-bold text-slate-700 dark:text-white">
-                {attendances.length}
-              </p>
-            </div>
+          <div className="px-5 py-3 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm min-w-[120px] text-center">
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+              Нийт бүртгэл
+            </p>
+            <p className="text-xl font-black text-indigo-600 dark:text-white">
+              {attendances.length}
+            </p>
           </div>
         </div>
 
-        {/* Filters & Stats Card */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="md:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 flex items-center justify-between shadow-sm">
-            <button
-              onClick={() => setCurrentMonth((m) => (m === 1 ? 12 : m - 1))}
-              className="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all"
-            >
-              <ChevronLeft size={20} className="text-slate-400" />
-            </button>
-            <div className="text-center">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
-                Хугацаа
-              </p>
-              <h3 className="text-lg font-bold dark:text-white">
-                {currentYear} он / {currentMonth} сар
-              </h3>
-            </div>
-            <button
-              onClick={() => setCurrentMonth((m) => (m === 12 ? 1 : m + 1))}
-              className="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all"
-            >
-              <ChevronRight size={20} className="text-slate-400" />
-            </button>
-          </div>
+        {/* Filters & Stats */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+          <AttendanceFilters
+            currentYear={currentYear}
+            currentMonth={currentMonth}
+            setCurrentMonth={setCurrentMonth}
+            setCurrentYear={setCurrentYear}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+          />
 
-          <div className="md:col-span-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-6 text-white shadow-xl shadow-indigo-200 dark:shadow-none flex justify-around items-center">
+          <div className="lg:col-span-3 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-[32px] p-6 text-white shadow-xl flex justify-around items-center">
             <div className="text-center">
-              <p className="text-indigo-100 text-[10px] font-bold uppercase tracking-widest mb-1 text-center">
+              <p className="text-indigo-100 text-[10px] font-bold uppercase mb-2">
                 Ажилласан
               </p>
-              <p className="text-2xl font-bold">{stats.workDays} өдөр</p>
+              <p className="text-3xl font-black">
+                {stats.workDays}{" "}
+                <span className="text-xs font-normal">өдөр</span>
+              </p>
             </div>
-            <div className="w-px h-10 bg-white/20" />
+            <div className="w-px h-12 bg-white/20" />
             <div className="text-center">
-              <p className="text-indigo-100 text-[10px] font-bold uppercase tracking-widest mb-1 text-center">
+              <p className="text-indigo-100 text-[10px] font-bold uppercase mb-2">
                 Хоцорсон
               </p>
-              <p className="text-2xl font-bold">{stats.lateDays}</p>
+              <p className="text-3xl font-black">{stats.lateDays}</p>
             </div>
-            <div className="w-px h-10 bg-white/20" />
+            <div className="w-px h-12 bg-white/20" />
             <div className="text-center">
-              <p className="text-indigo-100 text-[10px] font-bold uppercase tracking-widest mb-1 text-center">
+              <p className="text-indigo-100 text-[10px] font-bold uppercase mb-2">
                 Тасалсан
               </p>
-              <p className="text-2xl font-bold">{stats.absentDays}</p>
+              <p className="text-3xl font-black">{stats.absentDays}</p>
             </div>
           </div>
         </div>
 
-        {/* Attendance Table */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+        {/* Table */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
-                  <th className="px-6 py-5 text-xs font-bold uppercase tracking-wider text-slate-500">
+                  <th className="px-6 py-5 text-xs font-bold uppercase text-slate-500 tracking-wider">
                     Огноо
                   </th>
-                  <th className="px-6 py-5 text-xs font-bold uppercase tracking-wider text-slate-500 text-center">
+                  <th className="px-6 py-5 text-xs font-bold uppercase text-slate-500 text-center">
                     Ирсэн
                   </th>
-                  <th className="px-6 py-5 text-xs font-bold uppercase tracking-wider text-slate-500 text-center">
+                  <th className="px-6 py-5 text-xs font-bold uppercase text-slate-500 text-center">
                     Явсан
                   </th>
-                  <th className="px-6 py-5 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">
+                  <th className="px-6 py-5 text-xs font-bold uppercase text-slate-500 text-center">
+                    Хоцролт
+                  </th>
+                  <th className="px-6 py-5 text-xs font-bold uppercase text-slate-500 text-center">
+                    Илүү цаг
+                  </th>
+                  <th className="px-6 py-5 text-xs font-bold uppercase text-slate-500 text-right">
                     Төлөв
                   </th>
                 </tr>
@@ -183,8 +190,8 @@ const TimesheetPage = ({ employee, onClose }) => {
                 {loading ? (
                   <tr>
                     <td
-                      colSpan={4}
-                      className="px-6 py-12 text-center text-slate-400 animate-pulse uppercase text-xs font-bold"
+                      colSpan={6}
+                      className="px-6 py-16 text-center text-slate-400 animate-pulse font-black text-xs uppercase"
                     >
                       Уншиж байна...
                     </td>
@@ -192,8 +199,8 @@ const TimesheetPage = ({ employee, onClose }) => {
                 ) : attendances.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={4}
-                      className="px-6 py-12 text-center text-slate-400 uppercase text-xs font-bold"
+                      colSpan={6}
+                      className="px-6 py-16 text-center text-slate-400 font-black text-xs uppercase"
                     >
                       Мэдээлэл олдсонгүй
                     </td>
@@ -202,7 +209,7 @@ const TimesheetPage = ({ employee, onClose }) => {
                   attendances.map((item) => (
                     <tr
                       key={item.id}
-                      className="hover:bg-slate-50/80 dark:text-white dark:hover:bg-slate-800/40 transition-colors"
+                      className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors dark:text-white"
                     >
                       <td className="px-6 py-4 font-bold text-sm">
                         {new Date(item.date).toLocaleDateString("mn-MN", {
@@ -211,19 +218,37 @@ const TimesheetPage = ({ employee, onClose }) => {
                           day: "numeric",
                         })}
                       </td>
-                      <td className="px-6 py-4 text-center text-sm font-mono tracking-tighter">
+                      <td className="px-6 py-4 text-center text-sm font-mono">
                         {item.check_in
                           ? item.check_in.split("T")[1]?.substring(0, 5)
                           : "--:--"}
                       </td>
-                      <td className="px-6 py-4 text-center text-sm font-mono tracking-tighter">
+                      <td className="px-6 py-4 text-center text-sm font-mono">
                         {item.check_out
                           ? item.check_out.split("T")[1]?.substring(0, 5)
                           : "--:--"}
                       </td>
+                      <td className="px-6 py-4 text-center text-sm font-bold">
+                        {item.late_time && item.late_time !== "-" ? (
+                          <span className="text-red-500 bg-red-50 dark:bg-red-500/10 px-2 py-1 rounded-lg">
+                            -{item.late_time}
+                          </span>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-center text-sm font-bold">
+                        {item.overtime && item.overtime !== "-" ? (
+                          <span className="text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-1 rounded-lg">
+                            +{item.overtime}
+                          </span>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
                       <td className="px-6 py-4 text-right">
                         <span
-                          className={`inline-flex items-center px-3 py-1.5 rounded-xl text-[10px] font-bold border ${getStatusStyle(item.status)} uppercase`}
+                          className={`px-3 py-1.5 rounded-xl text-[9px] font-black border uppercase ${getStatusStyle(item.status)}`}
                         >
                           {item.status === "PRESENT"
                             ? "Ирсэн"

@@ -48,21 +48,21 @@ export const MENU_ITEMS = [
     icon: <FolderKanban size={18} />,
     roles: ["ADMIN", "MANAGER", "EMPLOYEE"],
   },
-  {
-    title: "Даалгавар",
-    path: "/task",
-    icon: <CheckSquare size={18} />,
-    roles: ["ADMIN", "MANAGER", "EMPLOYEE"],
-  },
+  // {
+  //   title: "Даалгавар",
+  //   path: "/task",
+  //   icon: <CheckSquare size={18} />,
+  //   roles: ["ADMIN", "MANAGER", "EMPLOYEE"],
+  // },
   {
     title: "System",
     isHeader: true,
     roles: ["ADMIN"],
   },
-  {
-    title: "Тохиргоо",
-    path: "/settings",
-    icon: <Settings size={18} />,
-    roles: ["ADMIN", "HR"],
-  },
+  // {
+  //   title: "Тохиргоо",
+  //   path: "/settings",
+  //   icon: <Settings size={18} />,
+  //   roles: ["ADMIN", "HR"],
+  // },
 ];

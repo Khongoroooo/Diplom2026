@@ -1,8 +1,11 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import HeaderSection from "../components/headerSection";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 export default function Positions() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [positions, setPositions] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -68,7 +71,15 @@ export default function Positions() {
 
   return (
     <div className="min-h-screen transition-colors duration-300 bg-white dark:bg-slate-950 space-y-8 p-8 font-sans text-slate-900 dark:text-white">
-      <HeaderSection paths={pageName} />
+      <div className="flex items-center gap-3 mb-10" data-aos="fade-right">
+        <button
+          onClick={() => navigate(-1)}
+          className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-600 dark:text-slate-400 hover:text-blue-600 hover:shadow-lg transition-all active:scale-90"
+        >
+          <ArrowLeft size={20} />
+        </button>
+        <HeaderSection paths={pageName} />
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Жагсаалт хэсэг */}
