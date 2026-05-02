@@ -5,6 +5,7 @@ import axios from "axios";
 import { Plus, Edit2, Trash2, UserCheck, User } from "lucide-react";
 import { data, useNavigate } from "react-router-dom";
 import AddUser from "./addUser";
+import { BASE_URL } from "../constants/url";
 
 // Role-уудын төрөл
 type Role = "ADMIN" | "HR" | "MANAGER" | "EMPLOYEE";

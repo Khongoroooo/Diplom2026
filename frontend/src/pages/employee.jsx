@@ -12,6 +12,7 @@ import {
   Edit2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../constants/url";
 
 export default function EmployeePage() {
   const [users, setUsers] = useState([]);
@@ -22,7 +23,7 @@ export default function EmployeePage() {
   // localStorage-аас role-ийг авах
   const currentRole = localStorage.getItem("user_role");
   const isAdminOrHR = currentRole === "ADMIN" || currentRole === "HR";
-  const API_BASE_URL = "http://192.168.1.10:8000/api/users";
+  const API_BASE_URL = `${BASE_URL}/api/users`;
 
   // Хэрэглэгчдийн жагсаалт татах
   const fetchUsers = async () => {

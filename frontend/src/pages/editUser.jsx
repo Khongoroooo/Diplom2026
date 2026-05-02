@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import HeaderSection from "../components/headerSection";
+import { BASE_URL } from "../constants/url";
 
 export default function EditUser() {
   const { id } = useParams(); // URL-аас ID-г авна
@@ -22,12 +23,9 @@ export default function EditUser() {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("access_token");
-        const response = await axios.get(
-          `http://127.0.0.1:8000/api/users/${id}/`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+        const response = await axios.get(`${BASE_URL}/api/users/${id}/`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setFormData(response.data);
       } catch (error) {
         console.log(`Мэдээлэл татахад алдаа гарлаа ${error}`);
@@ -50,13 +48,9 @@ export default function EditUser() {
     setLoading(true);
     try {
       const token = localStorage.getItem("access_token");
-      await axios.patch(
-        `http://127.0.0.1:8000/api/users/${id}/update/`,
-        formData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      await axios.patch(`${BASE_URL}/api/users/${id}/update/`, formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       alert("Мэдээлэл амжилттай шинэчлэгдлээ!");
       navigate("/settings");
     } catch (error) {

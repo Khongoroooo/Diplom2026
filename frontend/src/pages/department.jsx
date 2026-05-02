@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react"; // useEffect нэмсэн
 import HeaderSection from "../components/headerSection";
 import { ArrowLeft } from "lucide-react";
+import { BASE_URL } from "../constants/url";
 export default function Department() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -18,10 +19,9 @@ export default function Department() {
   const fetchDepartments = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      const response = await axios.get(
-        "http://127.0.0.1:8000/api/hr/departments/",
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+      const response = await axios.get(`${BASE_URL}/api/hr/departments/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setDepartments(response.data);
     } catch (error) {
       console.error("Дата татахад алдаа гарлаа:", error.response);
@@ -35,7 +35,7 @@ export default function Department() {
     try {
       const token = localStorage.getItem("access_token");
       await axios.post(
-        "http://127.0.0.1:8000/api/hr/departments/",
+        `${BASE_URL}/api/hr/departments/`,
         { name: newDeptName }, // API-ийн хүлээж авах талбарын нэрийг (name) шалгаарай
         { headers: { Authorization: `Bearer ${token}` } },
       );

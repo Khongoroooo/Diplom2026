@@ -3,6 +3,7 @@ import axios from "axios";
 import TimesheetPage from "../components/employeeTimesheet";
 import HeaderSection from "../components/headerSection";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../constants/url";
 
 const AttendancePage = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -17,14 +18,11 @@ const AttendancePage = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("access_token");
-      const response = await axios.get(
-        "http://192.168.1.10:8000/api/attendance/daily/",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await axios.get(`${BASE_URL}/api/attendance/daily/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
       setAttendanceData(response.data);
     } catch (error) {
       console.error("Дата татахад алдаа гарлаа:", error);

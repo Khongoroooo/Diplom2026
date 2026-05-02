@@ -3,6 +3,7 @@ import axios from "axios";
 import "react-datepicker/dist/react-datepicker.css";
 import { ArrowLeft } from "lucide-react";
 import HeaderSection from "./headerSection";
+import { BASE_URL } from "../constants/url";
 import AttendanceFilters from "./attendanceFilters"; // Шинэ компонентоо импортлох
 
 const TimesheetPage = ({ employee, onClose }) => {
@@ -13,7 +14,7 @@ const TimesheetPage = ({ employee, onClose }) => {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [selectedDate, setSelectedDate] = useState(null);
 
-  const API_BASE_URL = "http://192.168.1.10:8000/api/attendance";
+  const API_BASE_URL = `${BASE_URL}/api/attendance`;
   const employeeId = employee?.id || employee;
   const fullName = employee?.full_name || "Ажилтан";
 

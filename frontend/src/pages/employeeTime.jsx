@@ -4,6 +4,7 @@ import { Html5QrcodeScanner } from "html5-qrcode";
 import HeaderSection from "../components/headerSection";
 import AttendanceFilters from "../components/attendanceFilters"; // Шинэ компонентоо импортлох
 import { LogOut, LogIn, Plus, KeyRound, X, Send, QrCode } from "lucide-react";
+import { BASE_URL } from "../constants/url";
 
 export default function MyAttendancePage() {
   const [attendances, setAttendances] = useState([]);
@@ -21,7 +22,7 @@ export default function MyAttendancePage() {
   const [selectedDate, setSelectedDate] = useState(null); // Компонент Date объект авдаг болсон
 
   const pageName = [{ name: "Миний ирц" }];
-  const API_BASE_URL = "http://192.168.1.10:8000/api/attendance";
+  const API_BASE_URL = `${BASE_URL}/api/attendance`;
 
   const fetchMyAttendance = async () => {
     try {

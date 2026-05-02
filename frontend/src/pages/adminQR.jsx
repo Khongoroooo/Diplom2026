@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { QRCodeCanvas } from "qrcode.react";
 import { RefreshCw } from "lucide-react";
+import { BASE_URL } from "../constants/url";
 
 export default function AdminQR() {
   // Token болон PIN-г нэг объект болгож хадгалах нь илүү цэгцтэй
@@ -13,7 +14,7 @@ export default function AdminQR() {
     try {
       const token = localStorage.getItem("access_token");
       const response = await axios.get(
-        "http://127.0.0.1:8000/api/attendance/generate-qr/",
+        `${BASE_URL}/api/attendance/generate-qr/`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -103,9 +104,7 @@ export default function AdminQR() {
           </div>
           <p className="text-slate-700 font-semibold">
             Шинэчлэгдэхэд:{" "}
-            <span className="text-blue-600 font-mono text-lg">
-              {countdown}
-            </span>
+            <span className="text-blue-600 font-mono text-lg">{countdown}</span>
           </p>
         </div>
       </div>

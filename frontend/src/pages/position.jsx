@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import HeaderSection from "../components/headerSection";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { BASE_URL } from "../constants/url";
 
 export default function Positions() {
   const navigate = useNavigate();
@@ -39,8 +40,8 @@ export default function Positions() {
       const token = localStorage.getItem("access_token");
       const headers = { Authorization: `Bearer ${token}` };
       const [posRes, deptRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/api/hr/positions/", { headers }),
-        axios.get("http://127.0.0.1:8000/api/hr/departments/", { headers }),
+        axios.get(`${BASE_URL}/api/hr/positions/`, { headers }),
+        axios.get(`${BASE_URL}/api/hr/departments/`, { headers }),
       ]);
       setPositions(posRes.data);
       setDepartments(deptRes.data);
@@ -57,7 +58,7 @@ export default function Positions() {
     try {
       const token = localStorage.getItem("access_token");
       await axios.post(
-        "http://127.0.0.1:8000/api/hr/positions/",
+        `${BASE_URL}/api/hr/positions/`,
         { title: newPosTitle, department: selectedDept },
         { headers: { Authorization: `Bearer ${token}` } },
       );

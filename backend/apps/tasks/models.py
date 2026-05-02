@@ -28,6 +28,7 @@ class Project(models.Model):
 
     def __str__(self):
         return self.title
+    
 
 # --- ШИНЭЭР НЭМЭХ ТАСК МОДЕЛ ---
 
@@ -83,3 +84,55 @@ class Task(models.Model):
 
     def __str__(self):
         return f"{self.project.title} - {self.title}"
+    
+import os
+
+class Comment(models.Model):
+    # Хэрэглэгч болон Тасктай холбох
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, 
+        related_name='comments' # related_name-ийг өөрчилсөн (өмнө нь төсөлтэй давхцаж байсан)
+    )
+    task = models.ForeignKey(
+        Task, 
+        on_delete=models.CASCADE, 
+        related_name='comments'
+    )
+    
+    # Сэтгэгдлийн агуулга
+    # max_length-ийг хэтэрхий том тавих хэрэггүй, TextField ашиглах нь тохиромжтой
+    content = models.TextField(verbose_name="Сэтгэгдэл")
+    
+    # Reply систем (Нэг сэтгэгдэлд хариу бичих)
+    parent = models.ForeignKey(
+        'self', 
+        on_delete=models.CASCADE, 
+        null=True, 
+        blank=True, 
+        related_name='replies'
+    )
+    
+    # Хугацаа
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at'] # Шинэ нь дээрээ харагдана
+
+    def __str__(self):
+        return f"{self.user.username}-ийн сэтгэгдэл ({self.task.title})"
+
+# --- ФАЙЛ ХАВСАРГАХ ХЭСЭГ ---
+
+class CommentFile(models.Model):
+    comment = models.ForeignKey(
+        Comment, 
+        on_delete=models.CASCADE, 
+        related_name='attachments'
+    )
+    file = models.FileField(upload_to='comments/attachments/%Y/%m/%d/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def filename(self):
+        return os.path.basename(self.file.name)

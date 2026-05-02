@@ -3,9 +3,10 @@ import axios from "axios";
 import HeaderSection from "../components/headerSection";
 import { Search, Calendar, Folder, Plus } from "lucide-react"; // lucide-center -> lucide-react болгож засав
 import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../constants/url";
 
 // Тогтмол URL ашиглах
-const BASE_URL = "http://192.168.1.10:8000";
+const API_BASE_URL = BASE_URL;
 
 export default function ProjectPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,7 +35,7 @@ export default function ProjectPage() {
         }
 
         const response = await axios.get(
-          `${BASE_URL}/api/tasks/projects/`,
+          `${API_BASE_URL}/api/tasks/projects/`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -117,8 +118,8 @@ export default function ProjectPage() {
       <div className="space-y-3">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 text-slate-400">
-             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mb-2"></div>
-             <p>Уншиж байна...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mb-2"></div>
+            <p>Уншиж байна...</p>
           </div>
         ) : errorMsg ? (
           <div className="text-center py-20 text-red-500 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/20">
@@ -126,7 +127,9 @@ export default function ProjectPage() {
           </div>
         ) : filteredProjects.length === 0 ? (
           <div className="text-center py-20 text-slate-400">
-            {searchTerm ? `"${searchTerm}" нэртэй төсөл олдсонгүй.` : "Төсөл олдсонгүй."}
+            {searchTerm
+              ? `"${searchTerm}" нэртэй төсөл олдсонгүй.`
+              : "Төсөл олдсонгүй."}
           </div>
         ) : (
           filteredProjects.map((project) => (
@@ -168,7 +171,7 @@ export default function ProjectPage() {
       {isManagerOrAdmin && (
         <div className="fixed bottom-20 right-6 flex flex-col items-end gap-4 z-50">
           <button
-            onClick={() => navigate("/addproject")} 
+            onClick={() => navigate("/addproject")}
             className="w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 bg-gradient-to-r from-indigo-600 to-purple-500 text-white hover:scale-110 active:scale-95 shadow-indigo-500/20"
           >
             <Plus size={32} />

@@ -15,6 +15,7 @@ import {
 import HeaderSection from "../components/headerSection";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { BASE_URL } from "../constants/url";
 
 export default function AddUser() {
   const navigate = useNavigate();
@@ -43,12 +44,9 @@ export default function AddUser() {
   const fetchPositions = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      const response = await axios.get(
-        "http://127.0.0.1:8000/api/hr/positions/",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const response = await axios.get(`${BASE_URL}/api/hr/positions/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setPositions(response.data);
     } catch (error) {
       console.error("Албан тушаал татахад алдаа гарлаа", error);
@@ -70,7 +68,7 @@ export default function AddUser() {
       const token = localStorage.getItem("access_token");
       // formData доторх position утга нь select-ээс string-ээр ирдэг тул
       // шаардлагатай бол Number(formData.position) болгож болно.
-      await axios.post("http://127.0.0.1:8000/api/users/register/", formData, {
+      await axios.post(`${BASE_URL}/api/users/register/`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       navigate("/employees");

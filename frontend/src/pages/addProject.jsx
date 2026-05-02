@@ -14,6 +14,7 @@ import {
 import HeaderSection from "../components/headerSection";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { BASE_URL } from "../constants/url";
 
 export default function AddProject() {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ export default function AddProject() {
   const [users, setUsers] = useState([]);
   const [errors, setErrors] = useState({});
   const pageName = [{ name: "Төсөл нэмэх" }];
+  const API_BASE_URL = BASE_URL;
 
   const [formData, setFormData] = useState({
     title: "",
@@ -38,12 +40,9 @@ export default function AddProject() {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      const response = await axios.get(
-        "http://127.0.0.1:8000/api/users/list/",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const response = await axios.get(`${API_BASE_URL}/api/users/list/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setUsers(response.data);
     } catch (error) {
       console.error("Хэрэглэгчдийг татахад алдаа гарлаа", error);
@@ -73,7 +72,7 @@ export default function AddProject() {
 
     try {
       const token = localStorage.getItem("access_token");
-      await axios.post("http://127.0.0.1:8000/api/tasks/projects/", formData, {
+      await axios.post(`${API_BASE_URL}/api/tasks/projects/`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       navigate("/projects"); // Төслүүдийн жагсаалт руу буцах

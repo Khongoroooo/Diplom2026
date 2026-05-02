@@ -2,24 +2,23 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { BASE_URL } from "../constants/url";
 
 export default function LandingPage({ onLogin }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const API_BASE_URL = BASE_URL;
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        "http://192.168.1.10:8000/api/users/login/",
-        {
-          email: email,
-          password: password,
-        },
-      );
+      const response = await axios.post(`${API_BASE_URL}/api/users/login/`, {
+        email: email,
+        password: password,
+      });
 
       const { access, refresh } = response.data;
 
