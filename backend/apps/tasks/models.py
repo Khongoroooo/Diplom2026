@@ -66,6 +66,7 @@ class Task(models.Model):
         related_name='assigned_tasks',
         verbose_name="Хариуцагч"
     )
+    file = models.FileField(upload_to='tasks/attachments/%Y/%m/%d/', null=True, blank=True, verbose_name="Хавсаргасан файл")
     
     # Зураг дээрх NUMBER TEST багана (Жишээ нь: гүйцэтгэлийн хувь эсвэл оноо)
     number_test = models.IntegerField(default=0, verbose_name="Тоон үзүүлэлт")
