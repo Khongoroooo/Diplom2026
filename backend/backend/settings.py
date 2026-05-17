@@ -52,6 +52,9 @@ INSTALLED_APPS = [
     "apps.hr",
     "apps.tasks",
     "apps.attendance",
+    "apps.organizations",
+    "apps.notifications",
+    
 
 ]
 

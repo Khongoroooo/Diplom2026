@@ -1,8 +1,9 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from apps.organizations.models import BaseTenantModel
 
-class Attendance(models.Model):
+class Attendance(BaseTenantModel):
     class Status(models.TextChoices):
         PRESENT = "PRESENT", "Ирсэн"
         LATE = "LATE", "Хоцорсон"

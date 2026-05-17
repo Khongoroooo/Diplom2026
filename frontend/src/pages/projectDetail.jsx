@@ -248,7 +248,7 @@ export default function ProjectDetail() {
   const [allUsers, setAllUsers] = useState([]);
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [userSearch, setUserSearch] = useState("");
-
+  const [openStatusId, setOpenStatusId] = useState(null);
   const userRole = localStorage.getItem("user_role");
   const isManager = userRole === "MANAGER" || userRole === "ADMIN";
 
@@ -555,7 +555,7 @@ export default function ProjectDetail() {
 
                         {/* Status */}
                         <td className="py-3 px-3 text-center">
-                          <div className="relative inline-block">
+                          <div className="relative inline-block group">
                             <select
                               value={task.status}
                               onChange={(e) => {
@@ -568,24 +568,71 @@ export default function ProjectDetail() {
                                 }
                                 updateTask(task.id, { status: e.target.value });
                               }}
-                              className="appearance-none pr-5 pl-2 py-1.5 text-[10px] font-extrabold rounded-xl border-none outline-none cursor-pointer transition-all"
+                              // Select-ийн ерөнхий загвар
+                              className="appearance-none pr-7 pl-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider rounded-full border-0 outline-none cursor-pointer transition-all duration-200 hover:shadow-sm"
                               style={{
+                                // Сонгогдсон үеийн арын бүдэг өнгө болон текстийн өнгө
                                 backgroundColor:
-                                  STATUS[task.status]?.color + "22",
+                                  STATUS[task.status]?.color + "20",
                                 color: STATUS[task.status]?.color,
                               }}
                             >
-                              <option value="todo">To Do</option>
-                              <option value="working">Working</option>
-                              <option value="stuck">Stuck</option>
-                              <option value="review">Review</option>
-                              {isManager && (
-                                <option value="completed">Done</option>
+                              {/* Option-уудын текстийн өнгийг тус тусад нь өгөх */}
+                              <option
+                                value="todo"
+                                style={{
+                                  color: STATUS.todo.color,
+                                  backgroundColor: "white",
+                                }}
+                              >
+                                To Do
+                              </option>
+                              <option
+                                value="working"
+                                style={{
+                                  color: STATUS.working.color,
+                                  backgroundColor: "white",
+                                }}
+                              >
+                                Working
+                              </option>
+                              <option
+                                value="stuck"
+                                style={{
+                                  color: STATUS.stuck.color,
+                                  backgroundColor: "white",
+                                }}
+                              >
+                                Stuck
+                              </option>
+                              <option
+                                value="review"
+                                style={{
+                                  color: STATUS.review.color,
+                                  backgroundColor: "white",
+                                }}
+                              >
+                                Review
+                              </option>
+
+                              {/* Менежер бол Done-ийг харуулна */}
+                              {(isManager || task.status === "completed") && (
+                                <option
+                                  value="completed"
+                                  style={{
+                                    color: STATUS.completed.color,
+                                    backgroundColor: "white",
+                                  }}
+                                >
+                                  Done
+                                </option>
                               )}
                             </select>
+
+                            {/* Сумны дүрс (ChevronDown) - хөдөлгөөнгүй байлгах */}
                             <ChevronDown
                               size={10}
-                              className="absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-70"
                               style={{ color: STATUS[task.status]?.color }}
                             />
                           </div>
@@ -713,12 +760,6 @@ export default function ProjectDetail() {
             <ArrowLeft size={18} />
           </button>
           <HeaderSection paths={[{ name: "Төслүүд", link: "/projects" }]} />
-        </div>
-        <div className="flex justify-between gap-1  p-4">
-          <div className="">
-            <Star size={10} />
-          </div>
-          {project?.title || "..."},
         </div>
 
         {loading ? (
@@ -866,9 +907,15 @@ export default function ProjectDetail() {
               </div>
 
               {/* Filter */}
-              <div className="flex items-center gap-2">
-                <Filter size={13} className="text-slate-400" />
-                <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-1 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 text-slate-400">
+                  <Filter size={14} />
+                  <span className="text-[11px] font-semibold uppercase tracking-wider">
+                    Шүүлтүүр:
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner">
                   {[
                     "all",
                     "todo",
@@ -876,19 +923,35 @@ export default function ProjectDetail() {
                     "stuck",
                     "review",
                     "completed",
-                  ].map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => setFilterStatus(s)}
-                      className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all ${
-                        filterStatus === s
-                          ? "bg-indigo-500 text-white shadow-sm"
-                          : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                      }`}
-                    >
-                      {s === "all" ? "Бүгд" : STATUS[s]?.label}
-                    </button>
-                  ))}
+                  ].map((s) => {
+                    const isActive = filterStatus === s;
+                    const statusInfo = STATUS[s];
+
+                    // 'all' дээр Filter эсвэл Layers ашиглавал алдаа заахгүй
+                    const Icon = s === "all" ? Filter : statusInfo?.icon;
+
+                    return (
+                      <button
+                        key={s}
+                        onClick={() => setFilterStatus(s)}
+                        className={`
+            flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all duration-200
+            ${
+              isActive
+                ? s === "all"
+                  ? "bg-indigo-500 text-white shadow-md scale-105"
+                  : `${statusInfo?.bg} ${statusInfo?.text} ring-1 ring-inset ring-current/20 shadow-sm scale-105`
+                : "text-slate-500 hover:bg-white dark:hover:bg-slate-800"
+            }
+          `}
+                      >
+                        {Icon && (
+                          <Icon size={13} strokeWidth={isActive ? 3 : 2} />
+                        )}
+                        <span>{s === "all" ? "Бүгд" : statusInfo?.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>

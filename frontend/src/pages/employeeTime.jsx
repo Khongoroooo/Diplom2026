@@ -92,21 +92,46 @@ export default function MyAttendancePage() {
     setAttendanceCode("");
   };
 
+  // --- QR Scanner Logic Зассан хувилбар ---
   useEffect(() => {
     let scanner = null;
     if (isCodeModalOpen && isScanning) {
-      scanner = new Html5QrcodeScanner("reader", {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-      });
-      scanner.render((text) => {
-        scanner.clear();
-        handleVerify(text, "qr");
-      });
+      const timeoutId = setTimeout(() => {
+        try {
+          // Html5QrcodeScanner-ийг илүү нарийвчлалтай тохируулах
+          scanner = new Html5QrcodeScanner("reader", {
+            fps: 20, // Секундэд унших давтамжийг нэмсэн
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0,
+            showTorchButtonIfSupported: true, // Гэрэл асаах товч (хэрэв дэмждэг бол)
+            experimentalFeatures: {
+              useBarCodeDetectorIfSupported: true, // Илүү хурдан алгоритм ашиглах
+            },
+          });
+
+          scanner.render(
+            (text) => {
+              scanner.clear();
+              handleVerify(text, "qr");
+            },
+            (error) => {
+              error;
+              // Консол дээр "NotFoundException" алдааг харуулахгүй байх
+              // Энэ нь секунд тутамд олон удаа гардаг хэвийн үзэгдэл
+            },
+          );
+        } catch (err) {
+          console.error("Scanner error:", err);
+        }
+      }, 300);
+
+      return () => {
+        clearTimeout(timeoutId);
+        if (scanner) {
+          scanner.clear().catch((e) => console.error(e));
+        }
+      };
     }
-    return () => {
-      if (scanner) scanner.clear();
-    };
   }, [isCodeModalOpen, isScanning]);
 
   const getStatusStyle = (status) => {

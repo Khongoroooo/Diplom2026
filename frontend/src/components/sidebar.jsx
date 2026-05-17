@@ -10,7 +10,8 @@ import {
   Kanban,
   Clock,
   Menu, // Нэмсэн
-  X,    // Нэмсэн
+  X,
+  Bell, // Нэмсэн
 } from "lucide-react";
 
 export default function Sidebar({ onLogout }) {
@@ -81,21 +82,22 @@ export default function Sidebar({ onLogout }) {
         >
           <X size={20} />
         </button>
-
         {/* Logo Section */}
         <div className="px-6 py-4 text-xl font-bold">
           <span className="text-2xl bg-gradient-to-r from-blue-700 via-purple-500 to-pink-400 bg-clip-text text-transparent font-sans">
             Smart Flow
           </span>
         </div>
-
         {/* Navigation Section */}
         <nav className="flex-1 px-4 py-4 overflow-y-auto scrollbar-hide">
           {MENU_ITEMS.filter((item) => item.roles.includes(user.role)).map(
             (item, index) => {
               if (item.isHeader) {
                 return (
-                  <p key={index} className="mt-6 mb-2 text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold px-4 tracking-wider">
+                  <p
+                    key={index}
+                    className="mt-6 mb-2 text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold px-4 tracking-wider"
+                  >
                     {item.title}
                   </p>
                 );
@@ -106,10 +108,38 @@ export default function Sidebar({ onLogout }) {
                   <div key={index} className="relative mb-1" ref={settingsRef}>
                     {isSettingsOpen && (
                       <div className="absolute left-full ml-2 top-0 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-2 animate-in fade-in zoom-in-95 duration-200 z-[70]">
-                        <p className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Админ удирдлага</p>
-                        <SettingsSubLink to="/settings" icon={<Users size={16} className="text-blue-500" />} label="Хэрэглэгчийн тохиргоо" onClick={() => {setIsSettingsOpen(false); setIsOpen(false);}} />
-                        <SettingsSubLink to="/settings/projects" icon={<Kanban size={16} className="text-purple-500" />} label="Төсөл & Даалгавар" onClick={() => {setIsSettingsOpen(false); setIsOpen(false);}} />
-                        <SettingsSubLink to="/settings/attendance" icon={<Clock size={16} className="text-pink-500" />} label="Ирцийн дүрэм" onClick={() => {setIsSettingsOpen(false); setIsOpen(false);}} />
+                        <p className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                          Админ удирдлага
+                        </p>
+                        <SettingsSubLink
+                          to="/settings"
+                          icon={<Users size={16} className="text-blue-500" />}
+                          label="Хэрэглэгчийн тохиргоо"
+                          onClick={() => {
+                            setIsSettingsOpen(false);
+                            setIsOpen(false);
+                          }}
+                        />
+                        <SettingsSubLink
+                          to="/settings/projects"
+                          icon={
+                            <Kanban size={16} className="text-purple-500" />
+                          }
+                          label="Төсөл & Даалгавар"
+                          onClick={() => {
+                            setIsSettingsOpen(false);
+                            setIsOpen(false);
+                          }}
+                        />
+                        <SettingsSubLink
+                          to="/settings/attendance"
+                          icon={<Clock size={16} className="text-pink-500" />}
+                          label="Ирцийн дүрэм"
+                          onClick={() => {
+                            setIsSettingsOpen(false);
+                            setIsOpen(false);
+                          }}
+                        />
                       </div>
                     )}
 
@@ -119,10 +149,15 @@ export default function Sidebar({ onLogout }) {
                       ${isSettingsOpen ? "bg-blue-600/10 text-blue-500" : "dark:text-slate-300 text-slate-700 hover:bg-slate-800/10 hover:text-blue-500"}`}
                     >
                       <div className="flex items-center gap-3">
-                        <span className={isSettingsOpen ? "text-blue-500" : ""}>{item.icon}</span>
+                        <span className={isSettingsOpen ? "text-blue-500" : ""}>
+                          {item.icon}
+                        </span>
                         <span className="font-medium">{item.title}</span>
                       </div>
-                      <ChevronRight size={16} className={`transition-transform duration-200 ${isSettingsOpen ? "rotate-90" : ""}`} />
+                      <ChevronRight
+                        size={16}
+                        className={`transition-transform duration-200 ${isSettingsOpen ? "rotate-90" : ""}`}
+                      />
                     </button>
                   </div>
                 );
@@ -138,22 +173,57 @@ export default function Sidebar({ onLogout }) {
                   onClick={() => setIsOpen(false)} // Цэс дарахад sidebar хаагдана
                 />
               );
-            }
+            },
           )}
         </nav>
-
+        {/* notifications */}
+        <div className="px-4 mb-4">
+          <Link
+            to="/notifications"
+            className={`flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-200 
+      ${
+        location.pathname === "/notifications"
+          ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/30"
+          : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+      }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Bell size={20} />
+                {/* Хэрэв уншаагүй мэдэгдэл байгаа бол улаан цэг харуулна */}
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 border-2 border-white dark:border-slate-900 rounded-full"></span>
+              </div>
+              <span className="font-bold text-sm">Мэдэгдэл</span>
+            </div>
+            <ChevronRight size={14} opacity={0.5} />
+          </Link>
+        </div>
         {/* Profile Section */}
         <div className="relative p-4 mt-auto" ref={profileRef}>
           {isProfileOpen && (
             <div className="absolute bottom-20 left-4 right-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-2 mb-2 animate-in fade-in slide-in-from-bottom-4 duration-200 z-[60]">
               <div className="p-3 border-b border-slate-100 dark:border-slate-800 mb-1">
-                <p className="text-sm dark:text-white font-bold truncate">Мэнд хүргэе, {user.name}!</p>
-                <p className="text-xs text-slate-500 truncate uppercase tracking-tighter">{user.role}</p>
+                <p className="text-sm dark:text-white font-bold truncate">
+                  Мэнд хүргэе, {user.name}!
+                </p>
+                <p className="text-xs text-slate-500 truncate uppercase tracking-tighter">
+                  {user.role}
+                </p>
               </div>
-              <Link to="/profile" onClick={() => {setIsProfileOpen(false); setIsOpen(false);}} className="flex items-center gap-3 px-3 py-2 text-sm dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
+              <Link
+                to="/profile"
+                onClick={() => {
+                  setIsProfileOpen(false);
+                  setIsOpen(false);
+                }}
+                className="flex items-center gap-3 px-3 py-2 text-sm dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+              >
                 <User size={16} /> Профайл засах
               </Link>
-              <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
+              >
                 <LogOut size={16} /> Гарах
               </button>
             </div>
@@ -164,12 +234,27 @@ export default function Sidebar({ onLogout }) {
             className={`flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all duration-300 group
               ${isProfileOpen ? "bg-slate-100 dark:bg-slate-800 shadow-inner" : "bg-gradient-to-r from-blue-700 via-purple-500 to-pink-400 shadow-lg shadow-purple-500/20 hover:scale-[1.02]"}`}
           >
-            <img src={user.avatar} alt="Avatar" className="w-10 h-10 rounded-full border-2 border-white/20 object-cover flex-shrink-0" />
+            <img
+              src={user.avatar}
+              alt="Avatar"
+              className="w-10 h-10 rounded-full border-2 border-white/20 object-cover flex-shrink-0"
+            />
             <div className="flex-1 overflow-hidden">
-              <p className={`text-sm font-semibold truncate ${isProfileOpen ? "dark:text-white text-slate-900" : "text-white"}`}>{user.name}</p>
-              <p className={`text-[10px] uppercase truncate font-medium ${isProfileOpen ? "text-slate-500" : "text-white/70"}`}>{user.role}</p>
+              <p
+                className={`text-sm font-semibold truncate ${isProfileOpen ? "dark:text-white text-slate-900" : "text-white"}`}
+              >
+                {user.name}
+              </p>
+              <p
+                className={`text-[10px] uppercase truncate font-medium ${isProfileOpen ? "text-slate-500" : "text-white/70"}`}
+              >
+                {user.role}
+              </p>
             </div>
-            <ChevronUp size={16} className={`transition-transform duration-300 ${isProfileOpen ? "rotate-180 text-slate-500" : "text-white"}`} />
+            <ChevronUp
+              size={16}
+              className={`transition-transform duration-300 ${isProfileOpen ? "rotate-180 text-slate-500" : "text-white"}`}
+            />
           </div>
         </div>
       </aside>
@@ -184,11 +269,15 @@ function MenuItem({ icon, label, to, isActive, onClick }) {
       to={to}
       onClick={onClick}
       className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl transition-all duration-200 mb-1 group
-        ${isActive 
-          ? "bg-gradient-to-r from-blue-700/80 via-purple-500/80 to-pink-400/80 text-white shadow-md border-r-4 border-white/40" 
-          : "dark:text-slate-300 text-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-blue-500 dark:hover:text-white"}`}
+        ${
+          isActive
+            ? "bg-gradient-to-r from-blue-700/80 via-purple-500/80 to-pink-400/80 text-white shadow-md border-r-4 border-white/40"
+            : "dark:text-slate-300 text-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-blue-500 dark:hover:text-white"
+        }`}
     >
-      <span className={`transition-colors duration-200 ${isActive ? "text-white" : "group-hover:text-blue-500"}`}>
+      <span
+        className={`transition-colors duration-200 ${isActive ? "text-white" : "group-hover:text-blue-500"}`}
+      >
         {icon}
       </span>
       <span className="font-medium text-sm">{label}</span>

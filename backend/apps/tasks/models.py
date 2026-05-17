@@ -1,7 +1,8 @@
 from django.db import models
 from django.conf import settings
+from apps.organizations.models import BaseTenantModel
 
-class Project(models.Model):
+class Project(BaseTenantModel):
     STATUS_CHOICES = [
         ('new', 'Шинэ төсөл'),
         ('in_progress', 'Хийгдэж буй'),
@@ -14,13 +15,37 @@ class Project(models.Model):
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     start_date = models.DateField()
+    end_date = models.DateField(null=True, blank=True)
+    
     
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE, 
         related_name='owned_projects'
     )
-    
+    @property
+    def progress_percentage(self):
+        """
+        Төсөл доторх нийт таскуудын хэдэн хувь нь 'completed' байгааг тооцоолох
+        """
+        tasks = self.tasks.all()
+        total_tasks = tasks.count()
+        if total_tasks == 0:
+            return 0
+        
+        completed_tasks = tasks.filter(status='completed').count()
+        return int((completed_tasks / total_tasks) * 100)
+
+    @property
+    def end_date_status(self):
+        """
+        Дуусах огноо хэтэрсэн эсэхийг шалгах
+        """
+        from django.utils import timezone
+        if self.status != 'completed' and self.start_date: # Жишээ нь start_date-ээс хойш 30 хоног гэж тооцвол
+            # Хэрэв танд end_date байгаа бол түүгээр нь шалгана
+            pass
+        return False
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL, 
         related_name='involved_projects'
@@ -32,7 +57,7 @@ class Project(models.Model):
 
 # --- ШИНЭЭР НЭМЭХ ТАСК МОДЕЛ ---
 
-class Task(models.Model):
+class Task(BaseTenantModel):
     TASK_STATUS = [
         ('todo', 'To do'),
         ('review', 'Review'),
@@ -88,7 +113,7 @@ class Task(models.Model):
     
 import os
 
-class Comment(models.Model):
+class Comment(BaseTenantModel):
     # Хэрэглэгч болон Тасктай холбох
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
@@ -126,14 +151,62 @@ class Comment(models.Model):
 
 # --- ФАЙЛ ХАВСАРГАХ ХЭСЭГ ---
 
-class CommentFile(models.Model):
+class CommentFile(BaseTenantModel):
     comment = models.ForeignKey(
         Comment, 
         on_delete=models.CASCADE, 
         related_name='attachments'
     )
+    # FileField нь зураг болон бусад бүх файлыг хадгалж чадна
     file = models.FileField(upload_to='comments/attachments/%Y/%m/%d/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=255, blank=True, default='')
+
+    def is_image(self):
+        """Файл нь зураг эсэхийг шалгах функц"""
+        extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+        return any(self.file.name.lower().endswith(ext) for ext in extensions)
 
     def filename(self):
         return os.path.basename(self.file.name)
+class LeaveRequest(BaseTenantModel):
+    LEAVE_TYPES = [
+        ('sick', 'Өвчтэй'),
+        ('vacation', 'Ээлжийн амралт'),
+        ('personal', 'Ар гэрийн гачигдал'),
+        ('other', 'Бусад'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('pending', 'Менежер хүлээгдэж буй'),
+        ('manager_approved', 'Менежер зөвшөөрсөн (HR руу шилжсэн)'),
+        ('rejected', 'Татгалзсан'),
+        ('hr_processed', 'HR бүртгэж авсан (Дууссан)'),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, 
+        related_name='my_leave_requests'
+    )
+    # Ажилтан хүсэлт илгээхэд түүний менежер автоматаар тодорхойлогдоно
+    manager = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        related_name='managed_leave_requests'
+    )
+    leave_type = models.CharField(max_length=20, choices=LEAVE_TYPES)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    reason = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    
+    manager_note = models.TextField(blank=True, null=True) # Менежер тайлбар бичиж болно
+    hr_note = models.TextField(blank=True, null=True)      # HR тайлбар бичиж болно
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.get_leave_type_display()}"

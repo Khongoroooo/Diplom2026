@@ -302,7 +302,7 @@ export default function AddUser() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-5 bg-slate-900 dark:bg-blue-600 text-white font-bold rounded-[1.2rem] hover:shadow-xl hover:shadow-blue-500/30 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 text-lg mt-4"
+              className="w-full py-5 bg-blue-700 dark:bg-blue-600 text-white font-bold rounded-[1.2rem] hover:shadow-xl hover:shadow-blue-500/30 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 text-lg mt-4"
             >
               {loading ? (
                 <Loader2 className="animate-spin" size={24} />

@@ -1,29 +1,39 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Project, Task, CommentFile, Comment
+from .models import Project, Task, CommentFile, Comment, LeaveRequest
 
 User = get_user_model()
 
 
 # ─── Project ──────────────────────────────────────────────────────────────────
 
+
+
 class ProjectSerializer(serializers.ModelSerializer):
     user_name = serializers.SerializerMethodField()
     member_details = serializers.SerializerMethodField()
-    members = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=User.objects.all(),
-        required=False,
-    )
+    
+    # Эдгээр талбаруудыг заавал ингэж зарлах ёстой:
+    progress_percentage = serializers.ReadOnlyField() 
+    total_tasks = serializers.SerializerMethodField()
+    completed_tasks = serializers.SerializerMethodField()
 
     class Meta:
         model = Project
         fields = [
             'id', 'title', 'description', 'created_at',
-            'start_date', 'user', 'user_name', 'status',
-            'members', 'member_details',
+            'start_date', 'end_date', 'user', 'user_name', 'status',
+            'members', 'member_details', 'progress_percentage', 
+            'total_tasks', 'completed_tasks'
         ]
         read_only_fields = ['user', 'created_at']
+
+    # Дээр зарласан MethodField-үүдийн функцүүд:
+    def get_total_tasks(self, obj):
+        return obj.tasks.count()
+
+    def get_completed_tasks(self, obj):
+        return obj.tasks.filter(status='completed').count()
 
     def get_user_name(self, obj):
         if obj.user:
@@ -59,9 +69,10 @@ class CommentFileSerializer(serializers.ModelSerializer):
 
 # Write serializer — file upload хийхэд ашиглана
 class CommentFileWriteSerializer(serializers.ModelSerializer):
+    file = serializers.SerializerMethodField()
     class Meta:
         model = CommentFile
-        fields = ['id', 'comment', 'file', 'uploaded_at']
+        fields = ['id', 'comment', 'file', 'name', 'uploaded_at']
 
 
 # ─── Comment ──────────────────────────────────────────────────────────────────
@@ -83,10 +94,24 @@ class CommentSerializer(serializers.ModelSerializer):
         return f"{obj.user.last_name} {obj.user.first_name}".strip() or obj.user.username
 
     def get_replies(self, obj):
+        # Хэрэв replies байгаа бол өөрийгөө (recursive) дуудна
         if obj.replies.exists():
             return CommentSerializer(obj.replies.all(), many=True, context=self.context).data
         return []
 
+    def create(self, validated_data):
+        # 1. Request-ээс ирсэн файлуудыг 'attachments' гэдэг нэрээр авна
+        request = self.context.get('request')
+        files = request.FILES.getlist('attachments') # React дээр formData.append("attachments", file) гэж нэмсэн
+
+        # 2. Сэтгэгдлийг өөрийг нь хадгална
+        comment = Comment.objects.create(**validated_data)
+
+        # 3. Файл бүрийг CommentFile модел руу холбож хадгална
+        for f in files:
+            CommentFile.objects.create(comment=comment, file=f, name=f.name)
+            
+        return comment
 
 # ─── Task ─────────────────────────────────────────────────────────────────────
 
@@ -126,3 +151,23 @@ class TaskSerializer(serializers.ModelSerializer):
     def get_comments(self, obj):
         queryset = obj.comments.filter(parent__isnull=True)
         return CommentSerializer(queryset, many=True, context=self.context).data
+    
+class LeaveRequestSerializer(serializers.ModelSerializer):
+    user_name = serializers.ReadOnlyField(source='user.get_full_name')
+    # Менежерийг сонгох боломжтой болгох (PrimaryKeyRelatedField)
+    manager = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(role='MANAGER'))
+    manager_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = LeaveRequest
+        fields = [
+            'id', 'user', 'user_name', 'manager', 'manager_name',
+            'leave_type', 'start_date', 'end_date', 'reason', 
+            'status', 'created_at'
+        ]
+        read_only_fields = ['user', 'status', 'created_at']
+
+    def get_manager_name(self, obj):
+        if obj.manager:
+            return f"{obj.manager.last_name} {obj.manager.first_name}".strip() or obj.manager.username
+        return "Сонгоогүй"

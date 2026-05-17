@@ -25,6 +25,7 @@ class User(AbstractUser):
         choices=Role.choices, 
         default=Role.EMPLOYEE
     )
+    organization = models.ForeignKey('organizations.Organization', on_delete=models.CASCADE, related_name='users', null=True)
 
     phone_number = models.CharField(max_length=15, blank=True, null=True)
 

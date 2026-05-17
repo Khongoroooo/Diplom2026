@@ -9,7 +9,6 @@ import {
   AlignLeft,
   Calendar as CalendarIcon,
   Users,
-  CheckCircle2,
 } from "lucide-react";
 import HeaderSection from "../components/headerSection";
 import AOS from "aos";
@@ -28,8 +27,9 @@ export default function AddProject() {
     title: "",
     description: "",
     start_date: "",
-    status: "new",
-    members: [], // Энд сонгосон ажилчдын ID-нууд хадгалагдана
+    end_date: "", // Шинээр нэмэгдсэн
+    status: "new", // Сонголтгүйгээр шууд "new" утга илгээгдэнэ
+    members: [],
   });
 
   useEffect(() => {
@@ -72,10 +72,12 @@ export default function AddProject() {
 
     try {
       const token = localStorage.getItem("access_token");
+      // Backend-ийн ProjectViewSet.perform_create дээр organization-г авч байгаа тул
+      // эндээс зөвхөн төслийн мэдээллийг илгээхэд хангалттай
       await axios.post(`${API_BASE_URL}/api/tasks/projects/`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      navigate("/projects"); // Төслүүдийн жагсаалт руу буцах
+      navigate("/projects");
     } catch (error) {
       if (error.response && error.response.data) {
         setErrors(error.response.data);
@@ -124,7 +126,7 @@ export default function AddProject() {
                 Шинэ төсөл үүсгэх
               </h2>
               <p className="text-slate-500 text-sm">
-                Төслийн мэдээлэл болон багийг оноох
+                Байгууллагын шинэ төслийг бүртгэх
               </p>
             </div>
           </div>
@@ -161,7 +163,7 @@ export default function AddProject() {
                 </span>
                 <textarea
                   name="description"
-                  rows="4"
+                  rows="3"
                   className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all outline-none dark:text-white"
                   placeholder="Дэлгэрэнгүй тайлбар..."
                   onChange={handleChange}
@@ -170,9 +172,13 @@ export default function AddProject() {
               <ErrorMsg name="description" />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Эхлэх огноо */}
-              <div data-aos="fade-up" data-aos-delay="400">
+            {/* Огноонууд */}
+            <div
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
+              data-aos="fade-up"
+              data-aos-delay="400"
+            >
+              <div>
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 ml-1">
                   Эхлэх огноо
                 </label>
@@ -191,29 +197,27 @@ export default function AddProject() {
                 <ErrorMsg name="start_date" />
               </div>
 
-              {/* Статус */}
-              <div data-aos="fade-up" data-aos-delay="400">
+              <div>
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 ml-1">
-                  Төслийн статус
+                  Дуусах огноо
                 </label>
                 <div className="relative group">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 pointer-events-none">
-                    <CheckCircle2 size={18} />
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-red-500">
+                    <CalendarIcon size={18} />
                   </span>
-                  <select
-                    name="status"
-                    className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800 focus:border-indigo-500 outline-none dark:text-white appearance-none cursor-pointer transition-all"
+                  <input
+                    type="date"
+                    name="end_date"
+                    required
+                    className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-slate-50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800 focus:border-red-500 outline-none dark:text-white transition-all"
                     onChange={handleChange}
-                  >
-                    <option value="new">Шинэ төсөл</option>
-                    <option value="in_progress">Хийгдэж буй</option>
-                    <option value="maintenance">Арчилгаа</option>
-                  </select>
+                  />
                 </div>
+                <ErrorMsg name="end_date" />
               </div>
             </div>
 
-            {/* Гишүүд сонгох (Multi-select) */}
+            {/* Гишүүд сонгох */}
             <div data-aos="fade-up" data-aos-delay="450">
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 ml-1 flex items-center gap-2">
                 <Users size={16} /> Багийн гишүүд оноох
@@ -230,9 +234,9 @@ export default function AddProject() {
                     }`}
                   >
                     <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold mr-3">
-                      {user.first_name?.charAt(0)}
+                      {user.first_name?.charAt(0) || user.username?.charAt(0)}
                     </div>
-                    <span className="text-sm dark:text-slate-200">
+                    <span className="text-sm dark:text-slate-200 truncate">
                       {user.last_name} {user.first_name}
                     </span>
                   </div>
@@ -241,11 +245,11 @@ export default function AddProject() {
               <ErrorMsg name="members" />
             </div>
 
-            {/* Илгээх товч */}
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-5 bg-slate-900 dark:bg-indigo-600 text-white font-bold rounded-[1.2rem] hover:shadow-xl hover:shadow-indigo-500/30 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 text-lg mt-4"
+              className="w-full py-5 bg-gradient-to-br from-indigo-600 to-purple-700 text-white font-bold rounded-[1.2rem] hover:shadow-xl hover:shadow-indigo-500/30 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 text-lg mt-4"
             >
               {loading ? (
                 <Loader2 className="animate-spin" size={24} />

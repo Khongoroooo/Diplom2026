@@ -5,6 +5,8 @@ import {
   FolderKanban,
   CheckSquare,
   Settings,
+  FileBarChart,
+  CalendarClock,
 } from "lucide-react";
 
 export const MENU_ITEMS = [
@@ -15,9 +17,15 @@ export const MENU_ITEMS = [
     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
   },
   {
-    title: "Ирц",
+    title: "Миний ирц",
     path: "/emptime",
     icon: <Clock size={18} />,
+    roles: ["HR", "EMPLOYEE", "MANAGER"],
+  },
+  {
+    title: "Чөлөөний хүсэлт",
+    path: "/leave",
+    icon: <CalendarClock size={18} />,
     roles: ["HR", "EMPLOYEE", "MANAGER"],
   },
   {
@@ -59,10 +67,10 @@ export const MENU_ITEMS = [
     isHeader: true,
     roles: ["ADMIN"],
   },
-  // {
-  //   title: "Тохиргоо",
-  //   path: "/settings",
-  //   icon: <Settings size={18} />,
-  //   roles: ["ADMIN", "HR"],
-  // },
+  {
+    title: "Хяналтын самбар",
+    path: "/reports",
+    icon: <FileBarChart size={18} />,
+    roles: ["ADMIN"],
+  },
 ];

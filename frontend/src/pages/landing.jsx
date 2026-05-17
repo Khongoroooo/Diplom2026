@@ -28,15 +28,16 @@ export default function LandingPage({ onLogin }) {
       const decoded = jwtDecode(access);
       localStorage.setItem("user_role", decoded.role);
       localStorage.setItem("user_name", decoded.username || decoded.email);
+      localStorage.setItem("org_id", decoded.organization_id);
 
       onLogin(decoded);
       navigate("/dashboard");
     } catch (error) {
+      console.error("Login error details:", error.response?.data);
       const errorMsg =
         error.response?.data?.detail ||
         "Нэвтрэх нэр эсвэл нууц үг буруу байна!";
       alert(errorMsg);
-      console.error("Login error:", error);
     }
   };
   return (

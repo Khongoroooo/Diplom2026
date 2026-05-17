@@ -19,6 +19,9 @@ import MyAttendancePage from "./pages/employeeTime";
 import TimesheetPage from "./components/employeeTimesheet";
 import AddProject from "./pages/addProject";
 import ProjectDetail from "./pages/projectDetail";
+import AdminReportPage from "./pages/adminReport";
+import NotificationPage from "./pages/notification";
+import LeavePage from "./pages/leave";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -65,6 +68,13 @@ function App() {
                       <Route path="/timesheet" element={<TimesheetPage />} />
                       <Route path="/addproject" element={<AddProject />} />
                       <Route path="/projects/:id" element={<ProjectDetail />} />
+                      <Route path="/reports" element={<AdminReportPage />} />
+                      <Route path="/leave" element={<LeavePage />} />
+
+                      <Route
+                        path="/notifications"
+                        element={<NotificationPage />}
+                      />
                     </Routes>
                   </div>
                 </main>
